@@ -359,6 +359,7 @@
   function stopEditingTopField() {
     editingTopField = false;
     topField.readOnly = true;
+    topField.defaultValue = topField.value;
   }
 
   copyBtn.addEventListener('click', () => {
