@@ -413,10 +413,13 @@ Resolved: ${resolved}`;
   });
 
   resetBtn.addEventListener('click', () => {
+    // Remove the line that sets topField.value to Farouk
+    // Just form.reset() will revert topField to its defaultValue
     form.reset();
-    form.topField.value = "**SHS / TS - Farouk**";
-    form.topField.readOnly = true;
+    topField.readOnly = true;
     editingTopField = false;
+    // No need to set a hard-coded value here, 
+    // since defaultValue is now what the user last edited it to.
   });
 </script>
 </body>
