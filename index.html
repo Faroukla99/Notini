@@ -74,7 +74,9 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 30px;
-  }
+    gap: 20px; /* Adds space between the field and icons */
+}
+
 
   .field-area {
     flex: 1;
@@ -84,20 +86,22 @@
 
   .top-field {
     text-align: center;
-    border: none;
-    background: transparent;
+    border: none !important; /* Removes all borders */
+    background: transparent !important; /* Ensures background is transparent */
     color: inherit;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 5px 0;
+    font-size: 2.5rem !important; /* Increases font size for prominence */
+    font-weight: 700; /* Makes the text bolder */
+    padding: 0; /* Removes padding to eliminate any visual borders */
     width: 100%;
-    max-width: 300px;
-  }
+    max-width: 400px; /* Adjust as needed for your layout */
+    box-sizing: border-box;
+    text-transform: uppercase;
+}
 
   .top-field:focus {
-    outline: none;
-    border-bottom: 1px solid var(--accent-purple);
-  }
+    outline: none !important; /* Removes the default outline */
+    box-shadow: none !important; /* Ensures no shadow appears on focus */
+}
 
   .right-actions {
     display: flex;
@@ -106,7 +110,7 @@
   }
 
   .edit-icon, .dark-mode-toggle button {
-    font-size: 1.2rem;
+    font-size: 1.5rem; /* Increases icon size for better visibility */
     cursor: pointer;
     user-select: none;
     background: none;
@@ -115,12 +119,12 @@
     transition: transform 0.2s, opacity 0.2s;
     opacity: 0.8;
     padding: 0;
-  }
+}
 
   .edit-icon:hover, .dark-mode-toggle button:hover {
     transform: scale(1.1);
     opacity: 1;
-  }
+}
 
   .dark-mode-toggle button {
     font-size: 1.2rem;
@@ -230,6 +234,100 @@
       font-size: 1rem;
     }
   }
+  /* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: var(--container-bg-light);
+  padding: 20px 30px;
+  border-radius: var(--modal-border-radius, 8px);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+body.dark-mode .modal-content {
+  background-color: var(--container-bg-dark);
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-modal:hover {
+  color: #000;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 15px 0;
+  border: 1px solid var(--input-border-light);
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+body.dark-mode .modal-content input[type="text"] {
+  background: #1f1f1f;
+  border: 1px solid var(--input-border-dark);
+  color: var(--text-dark);
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent-purple);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.modal-content button:hover {
+  background: #3a0069;
+}
+
+@media (max-width: 500px) {
+  .modal-content h2 {
+    font-size: 1.2rem;
+  }
+  .modal-content input[type="text"],
+  .modal-content button {
+    font-size: 0.9rem;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -237,7 +335,7 @@
   <form id="noteForm">
     <div class="top-field-group">
       <div class="field-area">
-        <input type="text" class="top-field" id="topField" name="topField" value="**SHS / TS - Agent**" readonly />
+        <input type="text" class="top-field" id="topField" name="topField" value="Agent" readonly />
       </div>
       <div class="right-actions">
         <span class="edit-icon" id="editIcon">✎</span>
@@ -320,6 +418,16 @@
     </div>
   </form>
 </div>
+<!-- Modal Structure -->
+<div id="nameModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModal">&times;</span>
+    <h2>Enter Your Name</h2>
+    <input type="text" id="agentNameInput" placeholder="Your Name" required />
+    <button id="saveNameBtn">Save</button>
+  </div>
+</div>
+
 <script>
   const form = document.getElementById('noteForm');
   const copyBtn = document.getElementById('copyBtn');
@@ -363,7 +471,7 @@
   }
 
   copyBtn.addEventListener('click', () => {
-    const topFieldValue = form.topField.value.trim();
+    const topFieldValue = `**SHS/TS - ${form.topField.value.trim()}**`;
     const callerName = form.callerName.value.trim();
     const cid = form.cid.value.trim();
     const ban = form.ban.value.trim();
@@ -414,14 +522,60 @@ Resolved: ${resolved}`;
   });
 
   resetBtn.addEventListener('click', () => {
-    // Remove the line that sets topField.value to Farouk
-    // Just form.reset() will revert topField to its defaultValue
     form.reset();
     topField.readOnly = true;
     editingTopField = false;
-    // No need to set a hard-coded value here, 
-    // since defaultValue is now what the user last edited it to.
   });
+  // Modal Elements
+const modal = document.getElementById('nameModal');
+const closeModal = document.getElementById('closeModal');
+const saveNameBtn = document.getElementById('saveNameBtn');
+const agentNameInput = document.getElementById('agentNameInput');
+
+// Show modal on page load
+window.addEventListener('DOMContentLoaded', () => {
+  modal.style.display = 'flex';
+  agentNameInput.focus();
+});
+
+// Close modal when clicking the close icon
+closeModal.addEventListener('click', () => {
+  saveName();
+});
+
+// Save name and close modal when clicking Save button
+saveNameBtn.addEventListener('click', () => {
+  saveName();
+});
+// Allow pressing Enter to save the name
+agentNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault(); // Prevent form submission if inside a form
+    saveName();
+  }
+});
+// Function to save the agent's name
+function saveName() {
+  const name = agentNameInput.value.trim();
+  if (name === '') {
+    alert('Please enter your name.');
+    agentNameInput.focus();
+  } else {
+    topField.value = name;
+    topField.defaultValue = name;
+    modal.style.display = 'none';
+  }
+}
+
+// Close modal when clicking outside the modal content
+window.addEventListener('click', (event) => {
+  if (event.target == modal) {
+    saveName();
+  }
+}
+);
+
 </script>
 </body>
 </html>
+```
