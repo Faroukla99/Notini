@@ -470,56 +470,54 @@ body.dark-mode .modal-content input[type="text"] {
     topField.defaultValue = topField.value;
   }
 
-  copyBtn.addEventListener('click', () => {
-    const topFieldValue = `**SHS/TS - ${form.topField.value.trim()}**`;
-    const callerName = form.callerName.value.trim();
-    const cid = form.cid.value.trim();
-    const ban = form.ban.value.trim();
-    const cbr = form.cbr.value.trim();
-    const verifiedVia = form.verifiedVia.value;
-    const issueRequest = form.issueRequest.value.trim();
-    const deviceType = form.deviceType.value.trim();
-    const panelFirmware = form.panelFirmware.value.trim();
-    const routeThis = form.routeThis.value;
-    const goSend = form.goSend.value;
-    const insightWifi = form.insightWifi.value.trim();
-    const aoc = form.aoc.value;
-    const remedyTicket = form.remedyTicket.value.trim();
-    const resolution = form.resolution.value.trim();
-    const resolved = form.resolved.value;
+copyBtn.addEventListener('click', () => {
+  const prefix = `**SHS/TS - ${form.topField.value.trim()}**`;
+  let noteText = prefix + '\n\n';
 
-    const noteText =
-`${topFieldValue}
+  // Array of objects representing each form field with its label and value
+  const fields = [
+    { label: 'Caller’s name', value: form.callerName.value.trim() },
+    { label: 'CID', value: form.cid.value.trim() },
+    { label: 'BAN', value: form.ban.value.trim() },
+    { label: 'CBR', value: form.cbr.value.trim() },
+    { label: 'Verified via', value: form.verifiedVia.value },
+    { label: 'Issue/Request', value: form.issueRequest.value.trim() },
+    { label: 'Device Type', value: form.deviceType.value.trim() },
+    { label: 'Panel’s firmware', value: form.panelFirmware.value.trim() },
+    { label: 'Route this', value: form.routeThis.value },
+    { label: 'Go/Send', value: form.goSend.value },
+    { label: 'Insight Wi-Fi Signal', value: form.insightWifi.value.trim() },
+    { label: 'AOC', value: form.aoc.value },
+    { label: 'Remedy Ticket', value: form.remedyTicket.value.trim() },
+    { label: 'Resolution', value: form.resolution.value.trim() },
+    { label: 'Resolved', value: form.resolved.value }
+  ];
 
-Caller’s name: ${callerName}
-CID: ${cid}
-BAN: ${ban}
-CBR: ${cbr}
-Verified via: ${verifiedVia}
+  // Define labels after which to add a blank line
+  const labelsWithSpaceAfter = ['Verified via', 'Remedy Ticket'];
 
-Issue/Request:
-${issueRequest}
-
-Device Type: ${deviceType}
-Panel’s firmware: ${panelFirmware}
-
-Route this: ${routeThis}
-Go/Send: ${goSend}
-
-Insight Wi-Fi Signal: ${insightWifi}
-AOC: ${aoc}
-
-Remedy Ticket: ${remedyTicket}
-
-Resolution:
-${resolution}
-
-Resolved: ${resolved}`;
-
-    navigator.clipboard.writeText(noteText).then(() => {
-      alert('Note copied to clipboard!');
-    });
+  // Iterate through each field and append to noteText if not empty
+  fields.forEach(field => {
+    if (field.value) { // Check if the field is not empty
+      if (field.label === 'Issue/Request' || field.label === 'Resolution') {
+        // For textarea fields, add a newline before the label
+        noteText += `${field.label}:\n${field.value}\n\n`;
+      } else {
+        noteText += `${field.label}: ${field.value}\n`;
+        // If the current label requires a blank line after it, add it
+        if (labelsWithSpaceAfter.includes(field.label)) {
+          noteText += `\n`;
+        }
+      }
+    }
   });
+
+  navigator.clipboard.writeText(noteText.trim()).then(() => {
+    alert('Note copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+  });
+});
 
   resetBtn.addEventListener('click', () => {
     form.reset();
